@@ -17,9 +17,14 @@ import { SignupValidation } from "@/lib/validation";
 import  Loader  from "@/components/shared/Loader";
 import { Link } from "react-router-dom";
 import { createUserAccount } from "@/lib/appwrite/api";
+import { useToast } from "@/hooks/use-toast";
 
 const SignupForm = () => {
   const isLoading = false;
+  const { toast } = useToast();
+
+
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
@@ -37,12 +42,20 @@ const SignupForm = () => {
     // ✅ This will be type-safe and validated.
     const newUser = await createUserAccount(values);
     console.log(newUser);
+    if(!newUser){
+     return  toast({
+         title: "Signup failed please try again",
+       });
+      }
+   
+      // const session = await await signInAccount();
+     
   }
   return (
     <Form {...form}>
       <div className="sm:420 flex-center flex-col ">
         <img src="/assets/images/logo.svg" alt="logo" />
-        <h2 className="h3-bold md:h2-bold pt-5 sm:pt-12">
+        <h2 className="h3-bold md:h2-bold pt-5 sm:pt-2">
           Create a new account
         </h2>
         <p className="text-light-3 small-medium md:base-regular mt-2">

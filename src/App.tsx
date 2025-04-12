@@ -6,6 +6,9 @@ import AuthLayout from "./_auth/AuthLayout";
 import RootLayout from "./_root/RootLayout";
 
 import './globals.css';
+import { Toaster } from "@/components/ui/toaster";
+
+
 
 
 function App() {
@@ -13,17 +16,17 @@ function App() {
     <main className="flex flex-col min-h-screen">
       <Routes>
         {/* public routes */}
-      <Route element={<AuthLayout />}>
-        <Route path="/sign-in" element={<SigninForm />} />
-        <Route path="/sign-up" element={<SignupForm />} />
-      </Route>
-
+        <Route element={<AuthLayout />}>
+          <Route path="/sign-in" element={<SigninForm />} />
+          <Route path="/sign-up" element={<SignupForm />} />
+        </Route>
 
         {/* private routes  */}
         <Route element={<RootLayout />}>
-        <Route index element={<Home />} />
+          <Route index element={<Home />} />
         </Route>
       </Routes>
+      <Toaster />
     </main>
   );
 }
