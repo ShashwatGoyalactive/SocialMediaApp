@@ -1,6 +1,14 @@
-import { INewUser } from "@/types";
-import { account, appwriteConfig, avatars, databases, ID } from "./config";
-import { Query } from "appwrite";
+import { INewPost, INewUser } from "@/types";
+import {
+  account,
+  appwriteConfig,
+  avatars,
+  databases,
+  ID,
+  storage,
+} from "./config";
+import { ImageGravity, Query } from "appwrite";
+import { log } from "node:console";
 
 // ----------------------------------------- create a user account
 export async function createUserAccount(user: INewUser) {
@@ -53,7 +61,6 @@ export async function saveUserToDB(user: {
 
 export async function signInAccount(user: { email: string; password: string }) {
   try {
-  
     const session = await account.createEmailPasswordSession(
       user.email,
       user.password
@@ -66,8 +73,6 @@ export async function signInAccount(user: { email: string; password: string }) {
 
 export async function getCurrentUser() {
   try {
-    
-
     const currentAccount = await account.get();
     if (!currentAccount) throw Error;
     const currentUser = await databases.listDocuments(
@@ -82,12 +87,90 @@ export async function getCurrentUser() {
   }
 }
 
-
 export async function signOutAccount() {
   try {
     const session = await account.deleteSession("current");
     return session;
   } catch (error) {
-    console.log('Error while signing out the user ', error);
+    console.log("Error while signing out the user ", error);
+  }
+}
+
+export async function createPost(post: INewPost) {
+  try {
+    // upload image to storge
+    const uploadedFile = await uploadFile(post.file[0]);
+    if (!uploadedFile) throw Error;
+    // Get the file url
+    const fileUrl = await  getFilePreview(uploadedFile.$id);
+  
+    
+    if(!fileUrl){ 
+      // if the file is corrupted delete the file 
+     await deleteFile(uploadedFile.$id);
+      throw Error;}
+
+      const tags = post.tags?.replace(/ /g, '').split(',') || [];
+
+    const newPost = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      ID.unique(),
+      {  
+        creator: post.userId,
+        caption: post.caption,
+        imageUrl: fileUrl,
+        imageId: uploadedFile.$id,
+        location : post.location,
+        tags: tags,
+      }
+    )
+
+    if(!newPost) {
+     await deleteFile(uploadedFile.$id);
+      throw Error;
+    }
+    return newPost;
+  } catch (error) {
+    console.log("Error while creating the post ", error);
+  }
+}
+
+export async function uploadFile(file: File) {
+  try {
+    const uploadedFile = await storage.createFile(
+      appwriteConfig.storageId,
+      ID.unique(),
+      file
+    );
+    return uploadedFile;
+  } catch (error) {
+    console.log("Error while uploading the file ", error);
+  }
+}
+
+export async function getFilePreview(fileId: string) {
+  try {
+    const fileUrl = storage.getFilePreview(
+      appwriteConfig.storageId,
+      fileId,
+      2000,
+      2000,
+     ImageGravity.Top,
+      100
+    );
+    return fileUrl;
+  } catch (error) {
+    console.log("Error while getting the file preview ", error);
+  }
+}
+
+export async function deleteFile(fileId: string) {
+  try {
+     await storage.deleteFile(appwriteConfig.storageId, fileId);
+    return {status : 'ok'};
+  } catch (error) {
+    console.log("Error while deleting the file ", error);
+    
   }
 }
