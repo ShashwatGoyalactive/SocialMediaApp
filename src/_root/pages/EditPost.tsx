@@ -1,6 +1,6 @@
 import PostForm from "@/components/forms/PostForm";
 import { useParams } from "react-router-dom";
-import { useGetPostById } from "@/lib/react-query/queriesAndMutations";
+import { useGetPostById } from "@/lib/react-query/queries";
 import Loader from "@/components/shared/Loader";
 
 const EditPost = () => {
@@ -8,7 +8,7 @@ const EditPost = () => {
   const { data: post, isPending } = useGetPostById(id || "");
 
   if (isPending) {
-    return (<Loader />);
+    return <Loader />;
   }
   return (
     <div className="flex flex-1">

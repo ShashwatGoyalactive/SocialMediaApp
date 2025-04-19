@@ -1,42 +1,38 @@
 import { Input } from "@/components/ui/input";
-import React, { useState , useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import GridPostList from "../../components/shared/GridPostList";
 import SearchResults from "@/components/shared/SearchResults";
-import {
-  useGetPosts,
-  useSearchPosts,
-} from "@/lib/react-query/queriesAndMutations";
+import { useGetPosts, useSearchPosts } from "@/lib/react-query/queries";
 import useDebounce from "@/hooks/useDebounce";
 import Loader from "@/components/shared/Loader";
-import {useInView } from 'react-intersection-observer';
+import { useInView } from "react-intersection-observer";
 const Explore = () => {
-  const {ref, inView} = useInView();
+  const { ref, inView } = useInView();
   const { data: posts, fetchNextPage, hasNextPage } = useGetPosts();
   const [searchValue, setSearchValue] = useState("");
-  const  debouncedValue  = useDebounce(searchValue, 500);
-  const { data: searchedPosts, isFetching: isSearchFetching } =   useSearchPosts(debouncedValue);
+  const debouncedValue = useDebounce(searchValue, 500);
+  const { data: searchedPosts, isFetching: isSearchFetching } =
+    useSearchPosts(debouncedValue);
 
-
-  useEffect(()=> {
-    if(inView && !searchValue) fetchNextPage(); // implementing infinte scroll 
-  }, [inView , searchValue])
+  useEffect(() => {
+    if (inView && !searchValue) fetchNextPage(); // implementing infinte scroll
+  }, [inView, searchValue]);
 
   // console.log(posts);
-  
-  if(!posts){
+
+  if (!posts) {
     return (
       <div className="flex-center w-full h-full">
-        <Loader/>
+        <Loader />
       </div>
-    )
+    );
   }
 
-  const shouldShowSearchResults = searchValue !==  '';
+  const shouldShowSearchResults = searchValue !== "";
   const shouldShowPosts =
     !shouldShowSearchResults &&
     posts.pages.every((item) => item.documents.length === 0);
 
-    
   return (
     <div className="explore-container">
       <div className="explore-inner_container">
@@ -85,7 +81,6 @@ const Explore = () => {
           ))
         )}
       </div>
-
 
       {hasNextPage && !searchValue && (
         <div ref={ref} className="mt-10">

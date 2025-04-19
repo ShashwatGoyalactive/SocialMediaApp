@@ -16,8 +16,8 @@ import { Input } from "@/components/ui/input";
 import { SigninValidation } from "@/lib/validation";
 import Loader from "@/components/shared/Loader";
 import { Link, useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { useSignInAccount } from "@/lib/react-query/queriesAndMutations";
+import { useToast } from "@/components/ui/use-toast";
+import { useSignInAccount } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
 
 const SigninForm = () => {
@@ -37,14 +37,14 @@ const SigninForm = () => {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SigninValidation>) {
-    console.log('We are in');
-    
+    console.log("We are in");
+
     const session = await signInAccount({
       email: values.email,
       password: values.password,
     });
     console.log(session);
-    
+
     if (!session) {
       return toast({
         title: "Signin failed. Please  try again",

@@ -1,7 +1,7 @@
 import { Models } from "appwrite";
 import { Link } from "react-router-dom";
 
-import { PostStats } from "@/components/shared";
+import  PostStats  from "@/components/shared/PostStats";
 import { useUserContext } from "@/context/AuthContext";
 
 type GridPostListProps = {
@@ -19,12 +19,11 @@ const GridPostList = ({
 
   return (
     <ul className="grid-container">
-      {posts.map((post , index) => (
-        <li key={`${post.$id}${index}`} className="relative min-w-80 h-80">
+      {posts?.map((post) => (
+        <li key={post.$id} className="relative min-w-80 h-80">
           <Link to={`/posts/${post.$id}`} className="grid-post_link">
-           {/* src={post?.imageUrl} */}
             <img
-             src="/assets/icons/profile-placeholder.svg"
+              src={post.imageUrl}
               alt="post"
               className="h-full w-full object-cover"
             />
