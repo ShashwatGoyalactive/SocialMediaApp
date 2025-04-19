@@ -34,7 +34,7 @@ type IContextType = {
 const AuthContext = createContext<IContextType>(INITIAL_STATE);    
 
 
-export function  AuthProvider  ({children} : {children : React.ReactElement }) {
+ function  AuthProvider  ({children} : {children : React.ReactElement }) {
     const [user , setUser] = useState<IUser>(INITIAL_USER);
     const [isLoading , setIsLoading] = useState<boolean>(false);
     const [isAuthenticated , setIsAuthenticated] = useState<boolean>(false);
@@ -43,14 +43,17 @@ export function  AuthProvider  ({children} : {children : React.ReactElement }) {
     const checkAuthUser = async() => {
         try {
             const currentUser = await getCurrentUser();
-            setUser({
+            if(currentUser){
+               setUser({
                 id : currentUser.$id,
                 name : currentUser.name,
                 username : currentUser.username,
                 email : currentUser.email,
                 imageUrl : currentUser.imageUrl,
                 bio : currentUser.bio,
-            });
+            });   
+            }
+          
             setIsAuthenticated(true);
             return true;
         } catch (error) {
@@ -62,11 +65,14 @@ export function  AuthProvider  ({children} : {children : React.ReactElement }) {
     }
 
     useEffect(() => {
-        if(localStorage.getItem('cookieFallback') === '[]' || 
-            localStorage.getItem('cookieFallback') === null
-        || localStorage.getItem('cookieFallback') === undefined){
-                navigate('/sign-in');
-            } 
+        const cookieFallback = localStorage.getItem('cookieFallback');
+        if (
+          cookieFallback === "[]" ||
+          cookieFallback === null ||
+          cookieFallback === undefined
+        ) {
+          navigate("/sign-in");
+        } 
             checkAuthUser();
     },[]);
 

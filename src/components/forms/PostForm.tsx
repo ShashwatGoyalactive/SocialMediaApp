@@ -17,18 +17,21 @@ import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
 import { PostValidation } from "@/lib/validation";
 import { Models } from "appwrite";
-import { useCreatePost } from "@/lib/react-query/queriesAndMutations";
+import { useCreatePost, useDeletePost, useUpdatePost } from "@/lib/react-query/queriesAndMutations";
 import { useUserContext } from "@/context/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { getPostById } from "@/lib/appwrite/api";
 type PostFormProps = {
-  post?: Models.Document;
+  post?: Models.Document,
+  action : "create" | "update"
 };
 
-const PostForm = ({ post }: PostFormProps) => {
+const PostForm = ({ post , action }: PostFormProps) => {
 
   const navigate = useNavigate();
-  const {mutateAsync : createPost , isPending : isLoading} = useCreatePost();
+  const {mutateAsync : createPost , isPending : isLoadingCreate} = useCreatePost();
+  const {mutateAsync : updatePost , isPending : isLoadingUpdate} = useUpdatePost();
   const {user} = useUserContext();
   // 1. Define your form.
   const form = useForm<z.infer<typeof PostValidation>>({
@@ -43,16 +46,35 @@ const PostForm = ({ post }: PostFormProps) => {
 
   // 2. Define a submit handler.
    async function onSubmit(values: z.infer<typeof PostValidation>) {
+    if(post && action === "update") {
+      const updatedPost = await updatePost({...values,
+        postId : post.$id,
+        imageId : post.imageId,
+        imageUrl : post.imageUrl,
+      })
+
+      if(!updatedPost){
+        return toast({
+          title: "Please  try again",
+        })
+      }
+      return navigate(`/posts/${post.$id}`);
+    }
     const newPost = await createPost({...values, 
         userId : user.id,
     });
+
+   
     if(!newPost){
       return toast({
-        title: "Please  try again",
-      })
+        title: `${action} post failed. Please try again.`,
+      });
     }
     navigate('/');
   }
+
+  console.log(post?.imageUrl);
+  
   return (
     <Form {...form}>
       <form
@@ -138,8 +160,10 @@ const PostForm = ({ post }: PostFormProps) => {
           <Button
             type="submit"
             className="shad-button_primary whitespace-nowrap"
+            disabled={isLoadingCreate || isLoadingUpdate}
           >
-            Submit
+            {isLoadingCreate || isLoadingUpdate && 'Loading...'}
+            {action} post
           </Button>
         </div>
       </form>

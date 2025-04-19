@@ -1,13 +1,22 @@
 import React from "react";
 import { Models } from "appwrite";
 import { Link } from "react-router-dom";
-import { formatDateString, multiFormatDateString } from "@/lib/utils";
+import {  multiFormatDateString } from "@/lib/utils";
+import { useUserContext } from "@/context/AuthContext";
+import PostStats from "./PostStats";
+
 
 type PostCardProps = {
   post: Models.Document;
 };
 
 const PostCard = ({ post }: PostCardProps) => {
+  const {user} = useUserContext();
+// console.log({post});
+// console.log(post.imageUrl);
+ console.log(post.imageUrl);
+  if (!post) return;
+
   return (
     <div className="post-card">
       <div className="flex-between">
@@ -15,7 +24,7 @@ const PostCard = ({ post }: PostCardProps) => {
           <Link to={`/profile/${post.creator.$id}`}>
             <img
               src={
-                post?.creator?.imageUrl ||
+                post.creator?.imageUrl ||
                 "/assets/icons/profile-placeholder.svg"
               }
               alt="creator"
@@ -39,7 +48,32 @@ const PostCard = ({ post }: PostCardProps) => {
             </div>
           </div>
         </div>
+        <Link
+          to={`/update-post/${post.$id}`}
+          className={`${user.id !== post.creator.$id && "hidden"}`}
+        >
+          <img src="/assets/icons/edit.svg" alt="edit" width={20} height={20} />
+        </Link>
       </div>
+      <Link to={`/posts/${post.$id}`}>
+        <div className="small-medium lg:base-medium py-5">
+          <p>{post.caption}</p>
+          <ul className="flex gap-1 mt-2">
+            {post.tags.map((tag: string, index: string) => {
+              <li key={`${tag}${index}`} className="text-light-3 small-regular">
+                #{tag}
+              </li>;
+            })}
+          </ul>
+        </div>
+        {/* src={post.imageUrl || "assets/icons/profile-placeholder.svg"} */}
+        <img
+          src="assets/icons/profile-placeholder.svg"
+          className="post-card_img"
+          alt="post image"
+        />
+      </Link>
+      <PostStats post={post} userId={user.id} />
     </div>
   );
 };
