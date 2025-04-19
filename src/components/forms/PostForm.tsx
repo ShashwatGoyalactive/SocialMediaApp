@@ -19,13 +19,12 @@ import { PostValidation } from "@/lib/validation";
 import { Models } from "appwrite";
 import {
   useCreatePost,
-  useDeletePost,
   useUpdatePost,
 } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
 import { toast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
-import { getPostById } from "@/lib/appwrite/api";
+
 type PostFormProps = {
   post?: Models.Document;
   action: "create" | "update";
