@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import GridPostList from "../../components/shared/GridPostList";
 import SearchResults from "@/components/shared/SearchResults";
 import { useGetPosts, useSearchPosts } from "@/lib/react-query/queries";
