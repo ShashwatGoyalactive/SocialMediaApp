@@ -59,9 +59,9 @@ export const useSignOutAccount = () => {
 export const useGetPosts = () => {
   return useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
-    queryFn: ({ pageParam }: { pageParam: string }) =>
+    initialPageParam: undefined,
+    queryFn: ({ pageParam }) =>
       getInfinitePosts( {pageParam} ),
-    initialPageParam: '1',
     getNextPageParam: (lastPage: { documents: Models.Document[] }) => {
       if (!lastPage || lastPage.documents.length === 0) return null;
       const lastId = lastPage.documents[lastPage.documents.length - 1].$id;
