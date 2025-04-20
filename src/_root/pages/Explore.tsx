@@ -11,6 +11,7 @@ import SearchResults from "@/components/shared/SearchResults";
 const Explore = () => {
   const { ref, inView } = useInView();
   const { data: posts, fetchNextPage, hasNextPage } = useGetPosts();
+  console.log(posts);
 
   const [searchValue, setSearchValue] = useState("");
   const debouncedSearch = useDebounce(searchValue, 500);

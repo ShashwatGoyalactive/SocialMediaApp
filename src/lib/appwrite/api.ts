@@ -1,4 +1,4 @@
-import { ID, Query } from "appwrite";
+import { ID, Models, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
 import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
@@ -220,7 +220,11 @@ export async function searchPosts(searchTerm: string) {
   }
 }
 
-export async function getInfinitePosts({ pageParam }: { pageParam: string }) {
+type PageParam = { pageParam?: string };
+
+export async function getInfinitePosts({
+  pageParam,
+}: PageParam): Promise<{ documents: Models.Document[] }> {
   const queries = [Query.orderDesc("$updatedAt"), Query.limit(10)];
 
   if (pageParam) {
@@ -234,11 +238,10 @@ export async function getInfinitePosts({ pageParam }: { pageParam: string }) {
       queries
     );
 
-    if (!posts) throw Error;
-
     return posts;
   } catch (error) {
     console.log(error);
+    return { documents: [] }; // <-- safe fallback
   }
 }
 

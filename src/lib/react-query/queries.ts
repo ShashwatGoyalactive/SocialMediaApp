@@ -27,6 +27,7 @@ import {
   deleteSavedPost,
 } from "@/lib/appwrite/api";
 import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
+import { Models } from "appwrite";
 
 // ============================================================
 // AUTH QUERIES
@@ -58,17 +59,14 @@ export const useSignOutAccount = () => {
 export const useGetPosts = () => {
   return useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
-    queryFn: getInfinitePosts as any,
-    getNextPageParam: (lastPage: any) => {
-      // If there's no data, there are no more pages.
-      if (lastPage && lastPage.documents.length === 0) {
-        return null;
-      }
-
-      // Use the $id of the last document as the cursor.
+    queryFn: ({ pageParam }: { pageParam: string }) =>
+      getInfinitePosts( {pageParam} ),
+    initialPageParam: '1',
+    getNextPageParam: (lastPage: { documents: Models.Document[] }) => {
+      if (!lastPage || lastPage.documents.length === 0) return null;
       const lastId = lastPage.documents[lastPage.documents.length - 1].$id;
       return lastId;
-    },
+    }
   });
 };
 
